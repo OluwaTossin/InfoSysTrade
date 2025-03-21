@@ -1,0 +1,23 @@
+# Ignore Terraform state files (Sensitive Data)
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+
+# Ignore Terraform configuration lock files
+.terraform/
+.terraform.lock.hcl
+
+# Ignore local variable files (for credentials & secrets)
+terraform.tfvars
+*.tfvars
+
+# Ignore crash logs
+crash.log
+
+# Ignore .DS_Store (Mac users)
+.DS_Store
+
+# Ignore Python and VSCode config files (if applicable)
+*.pyc
+.vscode/

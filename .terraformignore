@@ -1,0 +1,28 @@
+# Ignore Terraform State Files (Sensitive & Large)
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+
+# Ignore Terraform provider plugin cache (huge in size)
+.terraform/
+.terraform.lock.hcl
+
+# Ignore Terraform Crash Logs
+crash.log
+
+# Ignore Local Terraform Variable Files (Sensitive)
+terraform.tfvars
+*.tfvars
+*.tfvars.json
+
+# Ignore Terraform Plan Files (they are unnecessary to store in Terraform Cloud)
+*.tfplan
+
+# Ignore any temporary files that Terraform may generate
+*.backup
+*.log
+
+# Ignore ZIP or archive files (if used for packaging)
+*.zip
+*.tar.gz
