@@ -1,5 +1,3 @@
-# Main Terraform configuration to deploy the AWS Cloud Architecture
-
 terraform {
   required_providers {
     aws = {
@@ -7,16 +5,16 @@ terraform {
       version = "~> 5.0"
     }
   }
+
   required_version = ">= 1.2.0"
 
   backend "s3" {
-  bucket         = "d-terraform-state-bucket-271"
-  key            = "terraform.tfstate"
-  region         = "us-east-1"
-  dynamodb_table = "terraform-lock"
-  encrypt        = true
-}
-
+    bucket         = "d-terraform-state-bucket-271"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-lock" # deprecated but still functional
+    encrypt        = true
+  }
 }
 
 provider "aws" {
@@ -36,7 +34,7 @@ module "vpc" {
 }
 
 # -----------------------------------------
-# Security Module (IAM, Security Groups, WAF)
+# Security Module
 # -----------------------------------------
 module "security" {
   source  = "./modules/security"
@@ -45,7 +43,7 @@ module "security" {
 }
 
 # -----------------------------------------
-# Compute Module (ALB, ASG, EC2, NAT Gateway)
+# Compute Module
 # -----------------------------------------
 module "compute" {
   source          = "./modules/compute"
@@ -57,7 +55,7 @@ module "compute" {
 }
 
 # -----------------------------------------
-# Database Module (RDS, Read Replicas, Redis)
+# Database Module
 # -----------------------------------------
 module "database" {
   source               = "./modules/database"
@@ -70,18 +68,41 @@ module "database" {
 }
 
 # -----------------------------------------
-# Storage Module (S3 Buckets, CloudFront, Route 53)
+# Create Replica S3 Bucket (for Replication)
+# -----------------------------------------
+resource "aws_s3_bucket" "replica_bucket" {
+  bucket = "info-sys-trade-replica"
+  acl    = "private"
+
+  tags = {
+    Name = "Replica Bucket"
+  }
+}
+
+# Enable versioning on replica bucket
+resource "aws_s3_bucket_versioning" "replica_versioning" {
+  bucket = aws_s3_bucket.replica_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# -----------------------------------------
+# Storage Module
 # -----------------------------------------
 module "storage" {
   source                 = "./modules/storage"
   bucket_name            = "info-sys-trade-assets"
   enable_cloudfront      = true
   enable_s3_replication  = true
-  replica_bucket_arn     = "arn:aws:s3:::your-replica-bucket-name"
+  replica_bucket_arn     = aws_s3_bucket.replica_bucket.arn
+
+  depends_on = [aws_s3_bucket_versioning.replica_versioning]
 }
 
 # -----------------------------------------
-# Monitoring & Logging (CloudWatch, CloudTrail)
+# Monitoring & Logging
 # -----------------------------------------
 module "monitoring" {
   source = "./modules/monitoring"
