@@ -73,10 +73,11 @@ module "database" {
 # Storage Module (S3 Buckets, CloudFront, Route 53)
 # -----------------------------------------
 module "storage" {
-  source                = "./modules/storage"
-  bucket_name           = "info-sys-trade-assets"
-  enable_cloudfront     = true
-  enable_s3_replication = true
+  source                 = "./modules/storage"
+  bucket_name            = "info-sys-trade-assets"
+  enable_cloudfront      = true
+  enable_s3_replication  = true
+  replica_bucket_arn     = "arn:aws:s3:::your-replica-bucket-name"
 }
 
 # -----------------------------------------

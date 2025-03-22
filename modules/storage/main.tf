@@ -54,6 +54,15 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 }
 
+resource "aws_s3_bucket_versioning" "versioning" {
+  bucket = aws_s3_bucket.static_assets.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
 resource "aws_s3_bucket_replication_configuration" "replication" {
   count  = var.enable_s3_replication ? 1 : 0
   bucket = aws_s3_bucket.static_assets.id
@@ -64,7 +73,8 @@ resource "aws_s3_bucket_replication_configuration" "replication" {
     status = "Enabled"
 
     destination {
-      bucket = var.replica_bucket_arn
+      bucket         = var.replica_bucket_arn
+      storage_class  = "STANDARD" 
     }
   }
 }
@@ -83,6 +93,48 @@ resource "aws_iam_role" "replication" {
           Service = "s3.amazonaws.com"
         },
         Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+resource "aws_s3_bucket_policy" "replication_policy" {
+  count  = var.enable_s3_replication ? 1 : 0
+  bucket = aws_s3_bucket.static_assets.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "ReplicationPermissions",
+        Effect    = "Allow",
+        Principal = {
+          AWS = aws_iam_role.replication[0].arn
+        },
+        Action = [
+          "s3:GetReplicationConfiguration",
+          "s3:ListBucket"
+        ],
+        Resource = aws_s3_bucket.static_assets.arn
+      },
+      {
+        Sid       = "ObjectReplication",
+        Effect    = "Allow",
+        Principal = {
+          AWS = aws_iam_role.replication[0].arn
+        },
+        Action = [
+          "s3:GetObjectVersion",
+          "s3:GetObjectVersionAcl",
+          "s3:GetObjectVersionForReplication",
+          "s3:GetObjectLegalHold",
+          "s3:GetObjectRetention",
+          "s3:GetObjectTagging",
+          "s3:GetObjectVersionTagging",
+          "s3:ReplicateObject",
+          "s3:ReplicateDelete",
+          "s3:ReplicateTags"
+        ],
+        Resource = "${aws_s3_bucket.static_assets.arn}/*"
       }
     ]
   })
