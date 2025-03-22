@@ -81,35 +81,4 @@ module "storage" {
 module "monitoring" {
   source = "./modules/monitoring"
   vpc_id = module.vpc.vpc_id
-}
-
-# -----------------------------------------
-# Outputs
-# -----------------------------------------
-output "vpc_id" {
-  value = module.vpc.vpc_id
-}
-
-output "alb_dns_name" {
-  value = module.compute.alb_dns_name
-}
-
-output "rds_endpoint" {
-  value = module.database.rds_endpoint
-}
-
-output "s3_bucket" {
-  value = module.storage.s3_bucket
-}
-
-output "cloudfront_url" {
-  value = module.storage.cloudfront_url
-}
-
-output "nat_gateway_id" {
-  value = module.vpc.nat_gateway_id
-}
-
-output "monitoring_dashboard_url" {
-  value = module.monitoring.dashboard_url
-}
+}  
