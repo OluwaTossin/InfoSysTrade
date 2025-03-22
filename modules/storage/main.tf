@@ -1,13 +1,20 @@
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
+
 resource "aws_s3_bucket" "static_assets" {
-  bucket = var.bucket_name
-  acl    = "private"
+  bucket = "${var.bucket_name}-${random_id.bucket_suffix.hex}"
 
   tags = {
     Name = "static-assets"
   }
 }
 
-# Optional CloudFront Distribution
+resource "aws_s3_bucket_acl" "static_assets_acl" {
+  bucket = aws_s3_bucket.static_assets.id
+  acl    = "private"
+}
+
 resource "aws_cloudfront_distribution" "cdn" {
   count = var.enable_cloudfront ? 1 : 0
 
@@ -27,7 +34,6 @@ resource "aws_cloudfront_distribution" "cdn" {
 
     forwarded_values {
       query_string = false
-
       cookies {
         forward = "none"
       }
@@ -51,14 +57,12 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 }
 
-# Optional Cross-Region Replication (simplified version)
 resource "aws_s3_bucket_replication_configuration" "replication" {
-  count = var.enable_s3_replication ? 1 : 0
-
-  role   = aws_iam_role.replication.arn
+  count  = var.enable_s3_replication ? 1 : 0
   bucket = aws_s3_bucket.static_assets.id
+  role   = aws_iam_role.replication[0].arn
 
-  rules {
+  rule {
     id     = "replication-rule"
     status = "Enabled"
 
@@ -75,12 +79,14 @@ resource "aws_iam_role" "replication" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Action    = "sts:AssumeRole",
-      Effect    = "Allow",
-      Principal = {
-        Service = "s3.amazonaws.com"
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "s3.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
       }
-    }]
+    ]
   })
 }

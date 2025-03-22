@@ -10,12 +10,13 @@ terraform {
   required_version = ">= 1.2.0"
 
   backend "s3" {
-    bucket         = "my-terraform-state-bucket"
-    key            = "terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "terraform-lock" # still works but is deprecated
-    encrypt        = true
-  }
+  bucket         = "d-terraform-state-bucket-271"
+  key            = "terraform.tfstate"
+  region         = "us-east-1"
+  dynamodb_table = "terraform-lock"
+  encrypt        = true
+}
+
 }
 
 provider "aws" {
@@ -61,7 +62,8 @@ module "compute" {
 module "database" {
   source               = "./modules/database"
   vpc_id               = module.vpc.vpc_id
-  db_subnet_group      = module.vpc.db_subnet_group
+  private_subnet_ids   = module.vpc.private_subnets
+  security_group       = module.security.web_sg_id
   primary_rds_instance = true
   enable_read_replica  = true
   enable_cache_cluster = true
@@ -72,6 +74,7 @@ module "database" {
 # -----------------------------------------
 module "storage" {
   source                = "./modules/storage"
+  bucket_name           = "info-sys-trade-assets"
   enable_cloudfront     = true
   enable_s3_replication = true
 }

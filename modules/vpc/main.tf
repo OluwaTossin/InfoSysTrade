@@ -42,8 +42,8 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_eip" "nat" {
-  count = var.enable_nat_gateway ? 1 : 0
-  vpc   = true
+  count  = var.enable_nat_gateway ? 1 : 0
+  domain = "vpc"
 }
 
 resource "aws_nat_gateway" "nat" {

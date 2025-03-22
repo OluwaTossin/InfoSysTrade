@@ -1,5 +1,5 @@
 variable "bucket_name" {
-  description = "Name of the primary S3 bucket for static assets"
+  description = "Base name for the S3 bucket (random suffix will be appended)"
   type        = string
 }
 
