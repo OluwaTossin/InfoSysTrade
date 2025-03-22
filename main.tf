@@ -13,7 +13,8 @@ terraform {
     bucket         = "my-terraform-state-bucket"
     key            = "terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "terraform-lock"
+    dynamodb_table = "terraform-lock" # still works but is deprecated
+    encrypt        = true
   }
 }
 
@@ -81,4 +82,4 @@ module "storage" {
 module "monitoring" {
   source = "./modules/monitoring"
   vpc_id = module.vpc.vpc_id
-}  
+}
