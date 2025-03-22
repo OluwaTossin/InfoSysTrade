@@ -10,10 +10,7 @@ resource "aws_s3_bucket" "static_assets" {
   }
 }
 
-resource "aws_s3_bucket_acl" "static_assets_acl" {
-  bucket = aws_s3_bucket.static_assets.id
-  acl    = "private"
-}
+
 
 resource "aws_cloudfront_distribution" "cdn" {
   count = var.enable_cloudfront ? 1 : 0
