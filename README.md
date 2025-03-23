@@ -20,8 +20,8 @@ Before deploying, ensure you have the following:
 ## **2️⃣ Steps to Deploy the Infrastructure**
 ### **Step 1: Clone the Repository**
 ```sh
-git clone <your-repository-url>
-cd terraform-aws-cloud-architecture
+git clone [<your-repository-url>](https://github.com/OluwaTossin/InfoSysTrade.git)
+cd InfoSysTrade
 ```
 
 ### **Step 2: Initialize Terraform**
