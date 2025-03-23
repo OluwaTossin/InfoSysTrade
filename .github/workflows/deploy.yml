@@ -18,6 +18,16 @@ jobs:
         with:
           terraform_version: 1.5.7
 
+      # ✅ SECURITY SCAN: Static Analysis using Trivy for IaC misconfigurations
+      - name: Security Scan (Trivy IaC)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: config
+          exit-code: 0           # Allow pipeline to pass even with findings
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL
+          format: table
+
       - name: Terraform Init
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
