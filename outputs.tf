@@ -13,8 +13,8 @@ output "rds_endpoint" {
   value       = module.database.rds_endpoint
 }
 
-output "s3_bucket_name" {
-  description = "Name of the primary S3 bucket"
+output "static_assets_bucket_name" {
+  description = "Name of the S3 bucket used for artifact upload"
   value       = module.storage.bucket_name
 }
 
