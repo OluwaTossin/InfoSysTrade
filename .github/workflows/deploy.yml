@@ -3,6 +3,10 @@ name: Deploy Infrastructure and Application
 on:
   push:
     branches: [ main ]
+    paths:
+      - '**.tf'
+      - '**.tfvars'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   deploy:
