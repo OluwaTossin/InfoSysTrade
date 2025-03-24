@@ -55,6 +55,20 @@ jobs:
           echo "Hello from GitHub Actions" > artifact.txt
           zip app.zip artifact.txt
 
+      - name: Wait for S3 bucket to exist
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          for i in {1..10}; do
+            if aws s3 ls "s3://info-sys-trade-assets-03fc330a" > /dev/null 2>&1; then
+              echo "✅ Bucket exists."
+              break
+            fi
+            echo "Waiting for bucket to be ready..."
+            sleep 10
+          done
+
       - name: Upload Artifact to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
