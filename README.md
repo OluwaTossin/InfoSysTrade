@@ -72,6 +72,6 @@ terraform destroy -auto-approve
 terraform fmt
 ```
 ✅ **Ensure Terraform state is stored securely** (S3 + DynamoDB).  
-✅ **Use version control (GitHub, GitLab) for tracking infrastructure changes.**  
+✅ **Use version control (GitHub, GitLab) for tracking infrastructure changes.** 
 
 ---
