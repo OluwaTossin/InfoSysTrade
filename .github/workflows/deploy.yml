@@ -55,22 +55,22 @@ jobs:
           echo "Hello from GitHub Actions" > artifact.txt
           zip app.zip artifact.txt
 
-      # ✅ Get S3 bucket name from Terraform output
+      # ✅ Safely extract bucket name to environment variable
       - name: Get Terraform Output (S3 Bucket)
         id: get_bucket
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          BUCKET_NAME=$(terraform output -raw static_assets_bucket_name)
-          echo "BUCKET_NAME=${BUCKET_NAME}" >> $GITHUB_ENV
+          terraform output -raw static_assets_bucket_name > tf_bucket_name.txt
+          BUCKET_NAME=$(cat tf_bucket_name.txt | tr -d '\r\n')
+          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
 
-      # ✅ Upload to S3 using dynamic bucket name
+      # ✅ Upload to S3 using dynamically fetched bucket name
       - name: Upload Artifact to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          BUCKET_NAME: ${{ env.BUCKET_NAME }}
         run: |
-          echo "Uploading to bucket: $BUCKET_NAME"
+          echo "Uploading to: $BUCKET_NAME"
           aws s3 cp app.zip s3://$BUCKET_NAME/
