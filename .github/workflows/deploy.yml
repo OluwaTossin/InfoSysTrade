@@ -55,16 +55,17 @@ jobs:
           echo "Hello from GitHub Actions" > artifact.txt
           zip app.zip artifact.txt
 
-      # ✅ Get S3 bucket name from Terraform output safely
+      # ✅ Get S3 bucket name from Terraform output
       - name: Get Terraform Output (S3 Bucket)
         id: get_bucket
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          BUCKET_NAME=$(terraform output -raw static_assets_bucket_name | tr -d '\r')
-          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+          BUCKET_NAME=$(terraform output -raw static_assets_bucket_name)
+          echo "BUCKET_NAME=${BUCKET_NAME}" >> $GITHUB_ENV
 
+      # ✅ Upload to S3 using dynamic bucket name
       - name: Upload Artifact to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
